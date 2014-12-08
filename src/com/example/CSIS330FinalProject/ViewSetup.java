@@ -7,10 +7,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 
 /**
- * Created by sean on 11/10/14.
- */
+* Created by sean
+* on 11/10/14.
+*/
 public class ViewSetup extends ListActivity {
     public static final String ROW_ID= "row_id";
     private ListView snakeViewList;
@@ -23,9 +25,9 @@ public class ViewSetup extends ListActivity {
         snakeViewList.setOnItemClickListener(viewAssignmentListner);
 
         String[] from =  new String[] { "name" };
-//        int[] to = new int[] {R.id.assignmentSetupView};
-
-
+        int[] to = new int[] {R.id.assignmentTextView};
+        snakeAdapter = new SimpleCursorAdapter(ViewSetup.this, R.layout.assignment_item, null, from, to);
+        setListAdapter(snakeAdapter);
     }
 
     AdapterView.OnItemClickListener viewAssignmentListner = new AdapterView.OnItemClickListener() {

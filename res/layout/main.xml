@@ -9,5 +9,7 @@
             android:layout_height="wrap_content"
             android:text="Hello World, MyActivity"
             />
+    <Button android:layout_width="fill_parent" android:layout_height="100px" android:text="text"
+            android:background="#ff574bff" android:id="@+id/btnSendSMS"/>
 </LinearLayout>
 

@@ -2,4 +2,6 @@
 <resources>
     <string name="app_name">CSIS330FinalProject</string>
     <string name="empty_name">Empty</string>
+    <string name="person_label">Name</string>
+    <string name="equipment_label">Equipment</string>
 </resources>

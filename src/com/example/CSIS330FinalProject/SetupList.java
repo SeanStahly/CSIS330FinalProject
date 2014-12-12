@@ -3,6 +3,8 @@ package com.example.CSIS330FinalProject;
 import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -14,6 +16,7 @@ public class SetupList extends ListActivity {
     public static final String ROW_ID = "row_id";
     private ListView snakeSetupListView;
     private CursorAdapter snakeAdapter;
+    private Button createSnakeList;
 //    public Button sendBtn;
     /**
      * Called when the activity is first created.
@@ -21,13 +24,14 @@ public class SetupList extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+//        setContentView(R.layout.main);
         snakeSetupListView = getListView();
         snakeSetupListView.setOnItemClickListener(viewSetupListener);
 
         String[] from = new String[] { "name" };
         int[] to = new int[] {R.id.snakeSetupView};
         snakeAdapter = new SimpleCursorAdapter(SetupList.this, R.layout.snake_setup_item, null, from, to);
+
         setListAdapter(snakeAdapter);
 
 //        sendBtn = (Button) findViewById(R.id.btnSendSMS);
@@ -38,6 +42,38 @@ public class SetupList extends ListActivity {
 //            }
 //        });
 
+    }
+
+    @Override
+            protected void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
+    protected void onStop() {
+        Cursor cursor = snakeAdapter.getCursor();
+        if (cursor != null)
+            cursor.deactivate();
+
+        snakeAdapter.changeCursor(null);
+        super.onStop();
+    }
+
+    private class getSetupsTask extends AsyncTask<Object, Object, Cursor> {
+        SetupDatabaseConnector databaseConnector = new SetupDatabaseConnector(SetupList.this);
+
+        @Override
+        protected Cursor doInBackground(Object... params) {
+            databaseConnector.open();
+            return databaseConnector.getAllSetups();
+        }
+
+        @Override
+        protected void onPostExecute(Cursor result) {
+            snakeAdapter.changeCursor(result);
+            databaseConnector.close();
+        }
     }
 
     OnItemClickListener viewSetupListener = new OnItemClickListener() {

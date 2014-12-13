@@ -3,6 +3,7 @@ package com.example.CSIS330FinalProject;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
@@ -23,6 +24,17 @@ public class ViewSetup extends ListActivity {
         super.onCreate(savedInsanceState);
         snakeViewList = getListView();
         snakeViewList.setOnItemClickListener(viewAssignmentListner);
+
+        Bundle extras = getIntent().getExtras();
+
+        Long i = extras.getLong(ROW_ID);
+        Log.d("test", i.toString());
+
+        if (extras.getLong(ROW_ID) > 0) {
+
+        } else {
+
+        }
 
         String[] from =  new String[] { "name" };
         int[] to = new int[] {R.id.assignmentTextView};

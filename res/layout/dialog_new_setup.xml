@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <TextView android:id="@+id/dialogNameLabel" android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+            android:text="@string/dialog_name"/>
+    <EditText android:id="@+id/dialogSetupName"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+            android:hint="@string/dialog_name_hint"/>
+    <TextView android:id="@+id/dialogChannelNumberLabel" android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+            android:text="@string/dialog_number"/>
+    <EditText android:id="@+id/dialogChannelNumber" android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="000"/>
+
+
+</LinearLayout>

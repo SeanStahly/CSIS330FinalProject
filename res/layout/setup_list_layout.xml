@@ -5,6 +5,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
     <ListView android:id="@+id/setupList" android:layout_width="fill_parent" android:layout_height="wrap_content"/>
-    <Button android:id="@+id/createNewSetupList" android:layout_width="fill_parent" android:layout_height="wrap_content"/>
+    <Button android:id="@+id/createNewSetupList" android:layout_width="fill_parent" android:layout_height="wrap_content"
+            android:text="@string/create_new_setup_label"/>
 
 </LinearLayout>

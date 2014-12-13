@@ -4,4 +4,8 @@
     <string name="empty_name">Empty</string>
     <string name="person_label">Name</string>
     <string name="equipment_label">Equipment</string>
+    <string name="create_new_setup_label">Create New Setup</string>
+    <string name="dialog_name">Setup Name:</string>
+    <string name="dialog_number">Number of Channels:</string>
+    <string name="dialog_name_hint">Name</string>
 </resources>

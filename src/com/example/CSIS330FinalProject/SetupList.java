@@ -12,9 +12,9 @@ import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class SetupList extends Activity {
-    public static final String ROW_ID = "row_id";
-    public static final String NAME_ID = "name_id";
-    public static final String CHANNEL_COUNT = "channel_count";
+    public  final String ROW_ID = "row_id";
+    public  final String NAME_ID = "name_id";
+    public  final String CHANNEL_COUNT = "channel_count";
     private ListView snakeSetupListView;
     private CursorAdapter snakeAdapter;
     private Button createSnakeListBtn;
@@ -60,6 +60,11 @@ public class SetupList extends Activity {
     protected void onResume() {
         super.onResume();
 
+        new getSetupsTask().execute((Object[]) null);
+    }
+
+    private class GetSetupsTask {
+        SetupDatabaseConnector databaseConnector = new SetupDatabaseConnector(SetupList.this);
     }
 
     @Override
@@ -94,6 +99,8 @@ public class SetupList extends Activity {
             Intent viewSetup = new Intent(SetupList.this, ViewSetup.class);
 
             viewSetup.putExtra(ROW_ID, l);
+            viewSetup.putExtra("new", false);
+            viewSetup.putExtra(CHANNEL_COUNT, 8);
             startActivity(viewSetup);
         }
     };
@@ -135,6 +142,7 @@ public class SetupList extends Activity {
         Intent newSetup = new Intent(SetupList.this, ViewSetup.class);
         newSetup.putExtra(NAME_ID, setupName);
         newSetup.putExtra(CHANNEL_COUNT, numberOfChannels);
+        newSetup.putExtra("new", true);
 
         startActivity(newSetup);
     }

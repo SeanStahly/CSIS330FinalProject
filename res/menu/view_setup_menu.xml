@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/saveSetup"
+          android:title="Save and Close"
+          android:orderInCategory="1"
+          android:titleCondensed="Save and Close"/>
+    <item android:id="@+id/sendText"
+          android:title="Send Text"
+          android:orderInCategory="2"
+          android:titleCondensed="Send Text"/>
+    <item android:id="@+id/exit"
+          android:title="Exit"
+          android:orderInCategory="3"
+          android:titleCondensed="Exit"/>
+    <item android:id="@+id/delete"
+          android:title="Delete Setup"
+          android:orderInCategory="4"
+          android:titleCondensed="Delete Setup"/>
+</menu>

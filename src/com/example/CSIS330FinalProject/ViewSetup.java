@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.telephony.SmsManager;
+import android.widget.AdapterView.OnItemClickListener;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -35,6 +37,9 @@ public class ViewSetup extends Activity {
     ArrayList<TextView> instruments = new ArrayList<TextView>();
     ArrayList<String> instumentTypes = new ArrayList<String>();
     ArrayList<String> phoneNumbers = new ArrayList<String>();
+    ArrayList<LinearLayout> linearLayouts = new ArrayList<LinearLayout>();
+
+    private int currentDialog;
 
     private  int channelCount;
 
@@ -42,6 +47,7 @@ public class ViewSetup extends Activity {
     private String toDBInstrumentString;
     private String toDBPhoneNumberString;
 
+    private String nameOfSetup;
 
     ArrayAdapter<String> adapter;
 
@@ -53,13 +59,13 @@ public class ViewSetup extends Activity {
 //        snakeViewList = getListView();
         extras = getIntent().getExtras();
 
+        Log.i("YEP!!!!!", "" +extras.getBoolean("new"));
+
+
         if (extras.getBoolean("new")) {
             getNewConstants();
-        } else {
-            getOldConstants();
+            initLayout();
         }
-
-        initLayout();
 
 //        snakeViewList.setOnItemClickListener(viewAssignmentListner);
 //
@@ -86,36 +92,44 @@ public class ViewSetup extends Activity {
     public void onResume() {
         super.onResume();
 
-        new LoadSetupTask().execute(rowID);
+        if (!extras.getBoolean("new")) {
+            new LoadSetupTask().execute(rowID);
+        }
 
     }
 
     protected void initLayout() {
+        setTitle(nameOfSetup);
         LinearLayout viewGroup = new LinearLayout(this);
         viewGroup.setOrientation(LinearLayout.VERTICAL);
 
 
 
-        for (int i = 0; i < extras.getInt("channel_count"); i++) {
+        for (int i = 0; i < channelCount; i++) {
             Log.i("Yo Over Here", ""+i);
-            LinearLayout assignmentLayout = new LinearLayout(this);
-            assignmentLayout.setOrientation(LinearLayout.HORIZONTAL);
-            assignmentLayout.setMinimumHeight(50);
 
-            labels.add(i, labelTextView(i+1));
-            assignmentLayout.addView(labels.get(i));
+            linearLayouts.add(i, new LinearLayout(this));
+            linearLayouts.get(i).setOrientation(LinearLayout.HORIZONTAL);
+            linearLayouts.get(i).setMinimumHeight(50);
 
-            people.add(i, assignmentTextView());
-            assignmentLayout.addView(people.get(i));
+
+
+            linearLayouts.get(i).addView(labels.get(i));
+
+
+            linearLayouts.get(i).addView(people.get(i));
             Log.i("YEAH! YEAH!", people.get(i).getText().toString());
-            peopleNames.add(i, people.get(i).getText().toString());
 
-            instruments.add(i, assignmentTextView());
-            assignmentLayout.addView(instruments.get(i));
 
-            phoneNumbers.add(i, "");
+            linearLayouts.get(i).addView(instruments.get(i));
+            currentDialog = (i+1);
 
-            viewGroup.addView(assignmentLayout);
+//            linearLayouts.get(i).setOnClickListener(viewAssignmentListener);
+            linearLayouts.get(i).setOnClickListener(new MyLovelyOnClickListener(currentDialog));
+
+            linearLayouts.get(i).setId(i);
+
+            viewGroup.addView(linearLayouts.get(i));
 
             viewGroup.addView(line());
         }
@@ -142,7 +156,9 @@ public class ViewSetup extends Activity {
 
 //        viewGroup.addView(tv);
 //        viewGroup.addView(snakeViewList);
-        setContentView(viewGroup);
+        ScrollView sV = new ScrollView(this);
+        sV.addView(viewGroup);
+        setContentView(sV);
     }
 
     private void createJSONs()  {
@@ -153,7 +169,7 @@ public class ViewSetup extends Activity {
         try {
             peopleJson.put("peopleArray", new JSONArray(peopleNames));
             instrumentJson.put("instrumentArray", new JSONArray(instumentTypes));
-            phoneNumberJson.put("phoneNumberArray", new JSONArray(peopleNames));
+            phoneNumberJson.put("phoneNumberArray", new JSONArray(phoneNumbers));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -194,7 +210,7 @@ public class ViewSetup extends Activity {
 
     private TextView assignmentTextView() {
         TextView tv = new TextView(this);
-        tv.setText("empty");
+        tv.setText("Unassigned");
         tv.setTextColor(Color.WHITE);
         tv.setTextSize(20);
         tv.setPadding(8,8,8,8);
@@ -237,25 +253,29 @@ public class ViewSetup extends Activity {
             int instrumentsIndex = result.getColumnIndex("instruments");
             int phonesIndex = result.getColumnIndex("phones");
 
-
-            String name = result.getString(nameIndex);
-
+            nameOfSetup = result.getString(nameIndex);
+            channelCount = result.getInt(channelsIndex);
             String peopleString = result.getString(peopleIndex);
-            Log.i("YOYO BOI!!!", name);
+            String instrumnetsString = result.getString(instrumentsIndex);
+            String phonesString = result.getString(phonesIndex);
             Log.i("This is a test", peopleString);
-//            nameTextView.setText(result.getString(nameIndex));
-//            phoneTextView.setText(result.getString(phoneIndex));
-//            emailTextView.setText(result.getString(emailIndex));
-//            streetTextView.setText(result.getString(streetIndex));
-//            cityTextView.setText(result.getString(cityIndex));
-
 
             try {
-                JSONObject json = new JSONObject(peopleString);
-                JSONArray stuff = json.optJSONArray("peopleArray");
+                JSONObject peopleJson = new JSONObject(peopleString);
+                JSONArray peopleJsonArray = peopleJson.optJSONArray("peopleArray");
                 peopleNames = new ArrayList<String>();
-                for (int i =0; i<stuff.length(); i++) {
-                    peopleNames.add(i, stuff.get(i).toString());
+                JSONObject instrumentJson = new JSONObject(instrumnetsString);
+                JSONArray instrumentJsonArray = instrumentJson.optJSONArray("instrumentArray");
+                instumentTypes = new ArrayList<String>();
+                JSONObject phoneJson = new JSONObject(phonesString);
+                JSONArray phoneJsonArray = phoneJson.optJSONArray("phoneNumberArray");
+                phoneNumbers = new ArrayList<String>();
+
+
+                for (int i =0; i<channelCount; i++) {
+                    peopleNames.add(i, peopleJsonArray.get(i).toString());
+                    instumentTypes.add(i, instrumentJsonArray.get(i).toString());
+                    phoneNumbers.add(i, phoneJsonArray.get(i).toString());
                     Log.i("Another Test!!!", peopleNames.get(i));
                 }
 
@@ -265,6 +285,9 @@ public class ViewSetup extends Activity {
 
             result.close();
             databaseConnector.close();
+            generateTextViews();
+            setTextViews();
+            initLayout();
         }
     }
 
@@ -294,7 +317,24 @@ public class ViewSetup extends Activity {
                 saveSetupTask.execute((Object[]) null);
                 return true;
             case R.id.sendText:
+                final String message = createTextMessage();
 
+                LayoutInflater inflater = LayoutInflater.from(ViewSetup.this);
+                View textMessageDialog = inflater.inflate(R.layout.dialog_send_text, null);
+
+                final TextView messageEntry = (TextView) textMessageDialog.findViewById(R.id.dialogMessageToBeSent);
+                messageEntry.setText(message);
+
+                AlertDialog dialog = new AlertDialog.Builder(ViewSetup.this)
+                        .setView(textMessageDialog)
+                        .setPositiveButton("Send", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                sendSMSMessage(message);
+                            }
+                        })
+                        .setNegativeButton("Cancel", null).create();
+                dialog.show();
                 return true;
             case R.id.exit:
                 finish();
@@ -315,6 +355,8 @@ public class ViewSetup extends Activity {
             createJSONs();
             databaseConnector.insertSetup(name, channels, toDBPeopleString, toDBInstrumentString, toDBPhoneNumberString);
         } else {
+            createJSONs();
+            databaseConnector.updateSetup(rowID, toDBPeopleString, toDBInstrumentString, toDBPhoneNumberString);
 
         }
     }
@@ -350,13 +392,114 @@ public class ViewSetup extends Activity {
         builder.show();
     }
 
-    private void getOldConstants() {
-
-    }
-
     private void getNewConstants() {
+        nameOfSetup = extras.getString("name_id");
         channelCount = extras.getInt("channel_count");
+        generateTextViews();
+        for (int i = 0; i < channelCount; i++) {
+
+            peopleNames.add(i, people.get(i).getText().toString());
+            instumentTypes.add(i, instruments.get(i).getText().toString());
+            phoneNumbers.add(i, "");
+        }
     }
+
+    private void generateTextViews() {
+
+        for (int i = 0; i < channelCount; i++) {
+            labels.add(i, labelTextView(i + 1));
+            people.add(i, assignmentTextView());
+            instruments.add(i, assignmentTextView());
+        }
+    }
+
+    private void setTextViews() {
+        Log.i("Size of peopleNames", ""+peopleNames.size());
+        Log.i("size of instruments", ""+instruments.size());
+        Log.i("size of instrumentTypes", ""+instumentTypes.size());
+        for (int i =0; i < channelCount; i++) {
+            people.get(i).setText(
+                    peopleNames.get(i));
+
+            instruments.get(i).setText(
+                    instumentTypes.get(i));
+        }
+    }
+
+    private class MyLovelyOnClickListener implements View.OnClickListener {
+        int myVariable;
+        public MyLovelyOnClickListener(int v) {
+            this.myVariable = v;
+        }
+
+        @Override
+        public void onClick(View v) {
+            LayoutInflater inflater = LayoutInflater.from(ViewSetup.this);
+            View customAssingmentDialog = inflater.inflate(R.layout.dialog_assignment, null);
+
+            final TextView nameEntry = (EditText) customAssingmentDialog.findViewById(R.id.dialogPersonNameEdit);
+            final TextView numberEntry = (EditText) customAssingmentDialog.findViewById(R.id.dialogPhoneNumberEditText);
+            final TextView instrumentEntry = (EditText) customAssingmentDialog.findViewById(R.id.dialogInstrumentEditText);
+
+            AlertDialog  dialog = new AlertDialog.Builder(ViewSetup.this)
+                    .setView(customAssingmentDialog)
+                    .setTitle("Channel "+myVariable+":")
+                    .setPositiveButton("Assign", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if (nameEntry != null && instrumentEntry != null) {
+                                int index = myVariable -1;
+                                peopleNames.set(index, nameEntry.getText().toString());
+                                phoneNumbers.set(index, numberEntry.getText().toString());
+                                instumentTypes.set(index, instrumentEntry.getText().toString());
+
+                                generateTextViews();
+                                setTextViews();
+                                initLayout();
+
+                            }
+
+                        }
+                    })
+                    .setNegativeButton("Cancel", null).create();
+            dialog.show();
+
+        }
+    };
+
+    protected void sendSMSMessage(String message) {
+        ArrayList<String> recipients = new ArrayList<String>();
+        for (int i =0; i < channelCount; i++) {
+            String test = phoneNumbers.get(i);
+            if (!test.equals("")) {
+                boolean add = true;
+                for (String s : recipients) {
+                    if (test.equals(s)) {
+                        add = false;
+                    }
+                }
+                if (add) {
+                    recipients.add(test);
+                    Log.i("Phone Numbers", test);
+                }
+            }
+        }
+        SmsManager smsManager = SmsManager.getDefault();
+        for (String s : recipients) {
+            smsManager.sendTextMessage(s, null, message, null, null);
+        }
+    }
+
+    private String createTextMessage() {
+        String message = "Snake List for "+ nameOfSetup+":\n";
+        for (int i =0; i < channelCount; i++) {
+            if ((!peopleNames.get(i).equals("Unassigned")) || (!instumentTypes.get(i).equals("Unassigned"))) {
+                message += ""+(i+1)+": "+peopleNames.get(i)+" - "+instumentTypes.get(i) + "\n";
+            }
+        }
+        return message;
+    }
+
 
 
 }

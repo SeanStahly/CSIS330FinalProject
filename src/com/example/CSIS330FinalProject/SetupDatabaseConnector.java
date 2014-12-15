@@ -49,8 +49,14 @@ public class SetupDatabaseConnector {
 
     }
 
-    public void updateSetup() {
+    public void updateSetup(long id, String people, String instruments, String phones) {
+        ContentValues editSetup = new ContentValues();
+        editSetup.put("people", people);
+        editSetup.put("instruments", instruments);
 
+        open();
+        databasetwo.update(FIRST, editSetup, "_id=" + id, null);
+        close();
     }
 
     public Cursor getAllSetups() {

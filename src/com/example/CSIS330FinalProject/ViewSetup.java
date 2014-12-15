@@ -2,17 +2,12 @@ package com.example.CSIS330FinalProject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ListActivity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.telephony.SmsManager;
-import android.widget.AdapterView.OnItemClickListener;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import org.json.JSONArray;
@@ -20,7 +15,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * Created by sean
@@ -28,8 +22,6 @@ import java.util.Objects;
  */
 public class ViewSetup extends Activity {
     public long rowID;
-    private ListView snakeViewList;
-    private CursorAdapter snakeAdapter;
     private Bundle extras;
     ArrayList<TextView> labels = new ArrayList<TextView>();
     ArrayList<TextView> people = new ArrayList<TextView>();
@@ -49,42 +41,16 @@ public class ViewSetup extends Activity {
 
     private String nameOfSetup;
 
-    ArrayAdapter<String> adapter;
 
     @Override
     public void onCreate(Bundle savedInsanceState) {
         super.onCreate(savedInsanceState);
 
-
-//        snakeViewList = getListView();
         extras = getIntent().getExtras();
-
-        Log.i("YEP!!!!!", "" +extras.getBoolean("new"));
-
-
         if (extras.getBoolean("new")) {
             getNewConstants();
             initLayout();
         }
-
-//        snakeViewList.setOnItemClickListener(viewAssignmentListner);
-//
-//
-//
-//        Long i = extras.getLong(ROW_ID);
-//        Log.d("test", i.toString());
-//
-//        if (extras.getLong(ROW_ID) > 0) {
-//
-//        } else {
-//
-//        }
-//
-//        String[] from =  new String[] { "name" };
-//        int[] to = new int[] {R.id.assignmentItem};
-//        snakeAdapter = new SimpleCursorAdapter(ViewSetup.this, R.layout.assignment_item, null, from, to);
-
-//        setListAdapter(snakeAdapter);
         rowID = extras.getLong("row_id");
     }
 
@@ -103,28 +69,15 @@ public class ViewSetup extends Activity {
         LinearLayout viewGroup = new LinearLayout(this);
         viewGroup.setOrientation(LinearLayout.VERTICAL);
 
-
-
         for (int i = 0; i < channelCount; i++) {
-            Log.i("Yo Over Here", ""+i);
 
             linearLayouts.add(i, new LinearLayout(this));
             linearLayouts.get(i).setOrientation(LinearLayout.HORIZONTAL);
             linearLayouts.get(i).setMinimumHeight(50);
-
-
-
             linearLayouts.get(i).addView(labels.get(i));
-
-
             linearLayouts.get(i).addView(people.get(i));
-            Log.i("YEAH! YEAH!", people.get(i).getText().toString());
-
-
             linearLayouts.get(i).addView(instruments.get(i));
             currentDialog = (i+1);
-
-//            linearLayouts.get(i).setOnClickListener(viewAssignmentListener);
             linearLayouts.get(i).setOnClickListener(new MyLovelyOnClickListener(currentDialog));
 
             linearLayouts.get(i).setId(i);
@@ -134,28 +87,6 @@ public class ViewSetup extends Activity {
             viewGroup.addView(line());
         }
 
-//        snakeViewList = new ListView(this);
-
-
-
-//        snakeViewList.setAdapter(snakeAdapter);
-
-//        LayoutInflater vi = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//        View v = vi.inflate(R.layout.assignment_item, null);
-////
-////
-//        for (int i = 0; i < extras.getInt("channel_count"); i++) {
-//            Log.i("Yo this is the test", "It's over HERE " + i);
-//            TextView tv = (TextView) v.findViewById(R.id.assignmentItem);
-//
-//            tv.setText("blarg");
-//            snakeViewList.addView(tv);
-//            viewGroup.addView(v, i, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
-//
-//        }
-
-//        viewGroup.addView(tv);
-//        viewGroup.addView(snakeViewList);
         ScrollView sV = new ScrollView(this);
         sV.addView(viewGroup);
         setContentView(sV);
@@ -176,18 +107,6 @@ public class ViewSetup extends Activity {
         toDBPeopleString = peopleJson.toString();
         toDBInstrumentString = instrumentJson.toString();
         toDBPhoneNumberString = phoneNumberJson.toString();
-
-//        try {
-//            JSONObject json = new JSONObject(peopleArrayList);
-//            JSONArray stuff = json.optJSONArray("peopleArray");
-//            ArrayList<String> things = new ArrayList<String>();
-//            for (int i =0; i<stuff.length(); i++) {
-//                things.add(i, stuff.get(i).toString());
-//            }
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
 
     }
 
@@ -210,27 +129,12 @@ public class ViewSetup extends Activity {
 
     private TextView assignmentTextView() {
         TextView tv = new TextView(this);
-        tv.setText("Unassigned");
+        tv.setText("");
         tv.setTextColor(Color.WHITE);
         tv.setTextSize(20);
         tv.setPadding(8,8,8,8);
         return tv;
     }
-
-    public void onClose() {
-
-    }
-
-
-//    AdapterView.OnItemClickListener viewAssignmentListner = new AdapterView.OnItemClickListener() {
-//        @Override
-//        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//            Intent viewAssignment = new Intent(ViewSetup.this, ViewAssignment.class);
-//
-//            viewAssignment.putExtra(ROW_ID, l);
-//            startActivity(viewAssignment);
-//        }
-//    };
 
     private class LoadSetupTask extends AsyncTask<Long, Object, Cursor> {
         SetupDatabaseConnector databaseConnector = new SetupDatabaseConnector(ViewSetup.this);
@@ -258,7 +162,6 @@ public class ViewSetup extends Activity {
             String peopleString = result.getString(peopleIndex);
             String instrumnetsString = result.getString(instrumentsIndex);
             String phonesString = result.getString(phonesIndex);
-            Log.i("This is a test", peopleString);
 
             try {
                 JSONObject peopleJson = new JSONObject(peopleString);
@@ -276,7 +179,6 @@ public class ViewSetup extends Activity {
                     peopleNames.add(i, peopleJsonArray.get(i).toString());
                     instumentTypes.add(i, instrumentJsonArray.get(i).toString());
                     phoneNumbers.add(i, phoneJsonArray.get(i).toString());
-                    Log.i("Another Test!!!", peopleNames.get(i));
                 }
 
             } catch (JSONException e) {
@@ -414,9 +316,6 @@ public class ViewSetup extends Activity {
     }
 
     private void setTextViews() {
-        Log.i("Size of peopleNames", ""+peopleNames.size());
-        Log.i("size of instruments", ""+instruments.size());
-        Log.i("size of instrumentTypes", ""+instumentTypes.size());
         for (int i =0; i < channelCount; i++) {
             people.get(i).setText(
                     peopleNames.get(i));
@@ -438,8 +337,11 @@ public class ViewSetup extends Activity {
             View customAssingmentDialog = inflater.inflate(R.layout.dialog_assignment, null);
 
             final TextView nameEntry = (EditText) customAssingmentDialog.findViewById(R.id.dialogPersonNameEdit);
+            nameEntry.setText(peopleNames.get(myVariable-1));
             final TextView numberEntry = (EditText) customAssingmentDialog.findViewById(R.id.dialogPhoneNumberEditText);
+            numberEntry.setText(phoneNumbers.get(myVariable-1));
             final TextView instrumentEntry = (EditText) customAssingmentDialog.findViewById(R.id.dialogInstrumentEditText);
+            instrumentEntry.setText(instumentTypes.get(myVariable-1));
 
             AlertDialog  dialog = new AlertDialog.Builder(ViewSetup.this)
                     .setView(customAssingmentDialog)
@@ -480,7 +382,6 @@ public class ViewSetup extends Activity {
                 }
                 if (add) {
                     recipients.add(test);
-                    Log.i("Phone Numbers", test);
                 }
             }
         }
@@ -493,13 +394,11 @@ public class ViewSetup extends Activity {
     private String createTextMessage() {
         String message = "Snake List for "+ nameOfSetup+":\n";
         for (int i =0; i < channelCount; i++) {
-            if ((!peopleNames.get(i).equals("Unassigned")) || (!instumentTypes.get(i).equals("Unassigned"))) {
+            if ((!peopleNames.get(i).equals("")) || (!instumentTypes.get(i).equals(""))) {
                 message += ""+(i+1)+": "+peopleNames.get(i)+" - "+instumentTypes.get(i) + "\n";
             }
         }
         return message;
     }
-
-
 
 }
